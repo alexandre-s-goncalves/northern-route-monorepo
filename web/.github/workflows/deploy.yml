@@ -1,0 +1,112 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Check Code Linting
+        run: npm run lint
+
+      - name: Check Code Formatting
+        run: npm run format -- --check
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Test Coverage
+        run: npm run coverage
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage/lcov.info
+
+  deploy-Homologation:
+    runs-on: ubuntu-latest
+    environment:
+      name: Homologation
+    needs: [tests, lint-and-format]
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies & Build QAS
+        run: |
+          npm ci
+          npm run build -- --base=/portfolio/qas/
+
+      - name: Deploy to QAS URL
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          destination_dir: qas
+          keep_files: true
+
+  deploy-Production:
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+    needs: [tests, lint-and-format]
+    if: github.event_name == 'release'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies & Build Prod
+        run: |
+          npm ci
+          npm run build -- --base=/portfolio/
+
+      - name: Deploy to Production
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          keep_files: true
