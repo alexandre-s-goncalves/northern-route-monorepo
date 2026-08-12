@@ -6,7 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AnalysisLevel>latest-All</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
     <NoWarn>$(NoWarn);CA2007;CA1812;CA1515;CA1000</NoWarn>
+
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -8,8 +8,10 @@
     <IsTestProject>true</IsTestProject>
     <AnalysisLevel>latest-All</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
     <Deterministic>false</Deterministic>
     <NoWarn>$(NoWarn);CA2007;CA1812;CA1707;CA1515</NoWarn>
+
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,3 +1,4 @@
+
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using LogisticPlatform.API.Common;
@@ -57,6 +58,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    
     app.MapScalarApiReference(options =>
     {
         options
