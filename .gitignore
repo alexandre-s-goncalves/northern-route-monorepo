@@ -427,3 +427,7 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Resultados de testes e relatórios de cobertura do .NET
+**/TestResults/
+**/CoverageReport/
