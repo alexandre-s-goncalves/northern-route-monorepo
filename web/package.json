@@ -16,14 +16,14 @@
     "doctor": "echo \"Full codebase\" | npx -y react-doctor@latest . || true",
     "coverage": "vitest run --coverage",
     "playwright:install": "playwright install --with-deps",
-    "setup:project": "bash scripts/bootstrap-project.sh",
     "prepare": "husky install"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.4",
     "axios": "^1.19.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "styled-components": "^6.5.2"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^20.5.3",
@@ -36,11 +36,13 @@
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@types/styled-components": "^5.1.36",
     "@typescript-eslint/eslint-plugin": "^8.61.1",
     "@typescript-eslint/parser": "^8.61.1",
     "@vitejs/plugin-react": "^6.0.4",
     "@vitest/coverage-v8": "^4.1.9",
     "@vitest/ui": "^4.1.9",
+    "babel-plugin-styled-components": "^2.3.0",
     "commitlint": "^20.5.3",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
