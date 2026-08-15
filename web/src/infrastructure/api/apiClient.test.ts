@@ -11,11 +11,15 @@ describe('Infrastructure - ApiClient Integration Tests', () => {
   });
 
   test('WHEN request interceptor encounters rejection SHOULD reject promise with original error', async () => {
-    const interceptorContainer = apiClient.interceptors.request as any;
-    const rejectHandler = interceptorContainer.handlers[0].rejected;
+    const requestInterceptor = apiClient.interceptors.request as unknown as {
+      handlers: Array<{ rejected: (error: unknown) => Promise<unknown> }>;
+    };
 
+    const rejectHandler = requestInterceptor.handlers[0].rejected;
     const fakeError = new Error('Network Simulation Failure');
-    
-    await expect(rejectHandler(fakeError)).rejects.toThrow('Network Simulation Failure');
+
+    await expect(rejectHandler(fakeError)).rejects.toThrow(
+      'Network Simulation Failure',
+    );
   });
 });
