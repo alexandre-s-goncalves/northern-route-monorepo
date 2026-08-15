@@ -1,14 +1,10 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import type {
-  ApiResult,
-  LoginRequest,
-  LoginResponse,
-} from 'infrastructure/index';
-import React from 'react';
-import { useLoginMutation } from './useAuth.ts';
 import { loginUser } from 'services/login';
+import React from 'react';
+import type { ApiResult, LoginResponse } from 'infrastructure/index';
+import { useLoginMutation } from './useAuth.ts';
 
 vi.mock('services/login', () => ({
   loginUser: vi.fn(),
@@ -21,7 +17,6 @@ const createWrapper = () => {
       mutations: { retry: false },
     },
   });
-
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
@@ -33,63 +28,76 @@ describe('Hooks - useAuth Unit Tests', () => {
     vi.clearAllMocks();
   });
 
-  test('WHEN invocation is successful SHOULD execute loginUser and save token into localStorage', async () => {
-    const mockRequest: LoginRequest = {
-      email: 'driver@northernroute.com',
-      passwordHash: 'SecurePassword123',
-    };
-
+  test('WHEN invocation is successful SHOULD store token AND return success', async () => {
     const mockResponse: ApiResult<LoginResponse> = {
       isSuccess: true,
-      errorMessage: null,
-      data: {
-        userId: 'id-123',
-        name: 'Alexandre Santos',
-        email: 'driver@northernroute.com',
-        role: 'DRIVER',
-        token: 'valid-jwt-token',
+      data: { 
+        userId: '1', 
+        name: 'Alexandre', 
+        email: 'driver@test.com', 
+        role: 'DRIVER', 
+        token: 'valid-jwt-token' 
       },
+      errorMessage: null,
     };
 
-    vi.mocked(loginUser).mockImplementationOnce(() =>
-      Promise.resolve(mockResponse),
-    );
+    vi.mocked(loginUser).mockResolvedValue(mockResponse as unknown as ApiResult<LoginResponse>);
 
-    const { result } = renderHook(() => useLoginMutation(), {
-      wrapper: createWrapper(),
+    const { result } = renderHook(() => useLoginMutation(), { wrapper: createWrapper() });
+
+    const response = await result.current.mutateAsync({ 
+      email: 'driver@test.com', 
+      passwordHash: 'Secure123' 
     });
 
-    result.current.mutate(mockRequest);
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(localStorage.getItem('@NorthernRoute:token')).toBe(
-      'valid-jwt-token',
-    );
+    expect(response.isSuccess).toBe(true);
+    expect(localStorage.getItem('@NorthernRoute:token')).toBe('valid-jwt-token');
   });
 
-  test('WHEN invocation fails or returns no token SHOULD NOT store token into localStorage', async () => {
-    const mockRequest: LoginRequest = {
-      email: 'driver@northernroute.com',
-      passwordHash: 'WrongPassword',
+  test('WHEN API returns 400 error SHOULD catch and return errorMessage', async () => {
+    const mockError = {
+      response: { 
+        data: { errorMessage: 'Invalid credentials.' } 
+      }
     };
 
-    const mockFailedResponse: ApiResult<LoginResponse> = {
-      isSuccess: false,
-      errorMessage: 'Invalid credentials',
-      data: null,
-    };
+    vi.mocked(loginUser).mockRejectedValue(mockError);
 
-    vi.mocked(loginUser).mockImplementationOnce(() =>
-      Promise.resolve(mockFailedResponse),
-    );
+    const { result } = renderHook(() => useLoginMutation(), { wrapper: createWrapper() });
 
-    const { result } = renderHook(() => useLoginMutation(), {
-      wrapper: createWrapper(),
+    const response = await result.current.mutateAsync({ 
+      email: 'driver@test.com', 
+      passwordHash: 'WrongPass' 
     });
 
-    result.current.mutate(mockRequest);
+    expect(response.isSuccess).toBe(false);
+    expect(response.errorMessage).toBe('Invalid credentials.');
+  });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  test('WHEN invocation is successful BUT token is missing SHOULD NOT store anything', async () => {
+    const mockResponse: ApiResult<LoginResponse> = {
+      isSuccess: true,
+      data: { userId: '', name: '', email: '', role: '', token: '' },
+      errorMessage: null,
+    };
+
+    vi.mocked(loginUser).mockResolvedValue(mockResponse);
+
+    const { result } = renderHook(() => useLoginMutation(), { wrapper: createWrapper() });
+
+    await result.current.mutateAsync({ email: 'a@a.com', passwordHash: '1' });
+
     expect(localStorage.getItem('@NorthernRoute:token')).toBeNull();
+  });
+
+  test('WHEN network error occurs WITHOUT response data SHOULD return default error message', async () => {
+    vi.mocked(loginUser).mockRejectedValue(new Error('Network Failure'));
+
+    const { result } = renderHook(() => useLoginMutation(), { wrapper: createWrapper() });
+
+    const response = await result.current.mutateAsync({ email: 'a@a.com', passwordHash: '1' });
+
+    expect(response.isSuccess).toBe(false);
+    expect(response.errorMessage).toBe('Invalid credentials.');
   });
 });
