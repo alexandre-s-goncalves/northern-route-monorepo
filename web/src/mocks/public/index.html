@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>NorthernRoute - Mock Server</title>
+    <link rel="stylesheet" href="/index.css" />
+  </head>
+  <body>
+    <div class="sidebar">
+      <h1>NorthernRoute - Local Mock Server</h1>
+      <p>
+        Click on any endpoint scenario below to inspect its live JSON response
+        contract.
+      </p>
+      <div id="endpointsContainer">Loading endpoints...</div>
+    </div>
+
+    <div class="preview-panel">
+      <h3 class="panel-title">Response Output Preview</h3>
+      <pre id="output">
+// Click an endpoint scenario on the left to fire the simulated request payload...</pre>
+    </div>
+
+    <script type="module" src="/index.js"></script>
+  </body>
+</html>
