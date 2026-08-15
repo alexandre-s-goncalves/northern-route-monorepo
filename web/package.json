@@ -16,7 +16,6 @@
     "doctor": "echo \"Full codebase\" | npx -y react-doctor@latest . || true",
     "coverage": "vitest run --coverage",
     "playwright:install": "playwright install --with-deps",
-    "setup:project": "bash scripts/bootstrap-project.sh",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -47,6 +46,7 @@
     "@vitejs/plugin-react": "^6.0.4",
     "@vitest/coverage-v8": "^4.1.9",
     "@vitest/ui": "^4.1.9",
+    "babel-plugin-styled-components": "^2.3.0",
     "commitlint": "^20.5.3",
     "concurrently": "^10.0.5",
     "cors": "^2.8.6",

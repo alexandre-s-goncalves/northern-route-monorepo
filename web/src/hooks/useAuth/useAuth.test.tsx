@@ -1,7 +1,11 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import type { ApiResult, LoginRequest, LoginResponse } from 'infrastructure/index';
+import type {
+  ApiResult,
+  LoginRequest,
+  LoginResponse,
+} from 'infrastructure/index';
 import React from 'react';
 import { useLoginMutation } from './useAuth.ts';
 import { loginUser } from 'services/login';
@@ -17,7 +21,7 @@ const createWrapper = () => {
       mutations: { retry: false },
     },
   });
-  
+
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
@@ -47,7 +51,9 @@ describe('Hooks - useAuth Unit Tests', () => {
       },
     };
 
-    vi.mocked(loginUser).mockImplementationOnce(() => Promise.resolve(mockResponse));
+    vi.mocked(loginUser).mockImplementationOnce(() =>
+      Promise.resolve(mockResponse),
+    );
 
     const { result } = renderHook(() => useLoginMutation(), {
       wrapper: createWrapper(),
@@ -56,7 +62,9 @@ describe('Hooks - useAuth Unit Tests', () => {
     result.current.mutate(mockRequest);
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(localStorage.getItem('@NorthernRoute:token')).toBe('valid-jwt-token');
+    expect(localStorage.getItem('@NorthernRoute:token')).toBe(
+      'valid-jwt-token',
+    );
   });
 
   test('WHEN invocation fails or returns no token SHOULD NOT store token into localStorage', async () => {
@@ -71,7 +79,9 @@ describe('Hooks - useAuth Unit Tests', () => {
       data: null,
     };
 
-    vi.mocked(loginUser).mockImplementationOnce(() => Promise.resolve(mockFailedResponse));
+    vi.mocked(loginUser).mockImplementationOnce(() =>
+      Promise.resolve(mockFailedResponse),
+    );
 
     const { result } = renderHook(() => useLoginMutation(), {
       wrapper: createWrapper(),
