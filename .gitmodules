@@ -1,0 +1,9 @@
+[submodule "northern-route-backend"]
+	path = northern-route-backend
+	url = https://github.com/alexandre-s-goncalves/northern-route-backend.git
+[submodule "northern-route-web"]
+	path = northern-route-web
+	url = https://github.com/alexandre-s-goncalves/northern-route-web.git
+[submodule "northern-route-mobile"]
+	path = northern-route-mobile
+	url = https://github.com/alexandre-s-goncalves/northern-route-mobile.git
